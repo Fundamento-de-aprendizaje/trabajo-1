@@ -68,6 +68,7 @@ print("Prueba:   ",len(prueba))
 #                     print(example)
 
 #     return contador
+
 def aplicarHipotesis(examples, hypothesis):
     contador = 0
     for example in examples:
@@ -82,7 +83,7 @@ def aplicarHipotesis(examples, hypothesis):
         else: 
             print("NO CUMPLE", example)
     return contador
-# hipotesisTrucha2= [50, '?', '?', 'INQUILINO', 'NO']
+# hipotesisTrucha2= [35, '?', '?', '?', 'NO']
 contador=   aplicarHipotesis(prueba,hypothesis)
 print("\nPREDICCIÓN    ", contador,"  APROBADOS DE UN TOTAL DE ",len(prueba)  )
 print(" \nEN PORCENTAJE    ", int(contador/len(prueba)*100) ," % "  )
@@ -123,7 +124,7 @@ print(f"TP (TRUE POSITIVE): {TP}")
 print(f"FP (FALSE POSITIVE): {FP}")
 print(f"TN (TRUE NEGATIVE): {TN}")
 print(f"FN (FALSE NEGATIVE): {FN}")
-print(" ",TP,  "|", FP, "\n ", FN ,"|" ,TN )
+print(" ",TP,  "|", FN , "\n ",FP ,"|" ,TN )
 
 # Cálculos de métricas
 total = TP + FP + TN + FN
@@ -136,10 +137,26 @@ fpr = FP / (FP + TN) if FP + TN > 0 else 0
 
 # Mostrar métricas
 print("\n--- MÉTRICAS ---")
-print(f"Accuracy: {accuracy:.2f}")
+ 
+print(f"Accuracy(proporción correctamente clasificadas): {accuracy:.2f}")
+print("Es la proporci ́on de instancias que han sido correctamente clasificadas.\n")
+
+
 print(f"Recall (Sensibilidad): {recall:.2f}")
+print("Mide la probabilidad de que el clasificador detecte un caso Positivo cuando en verdad lo es.\n")
+
+
 print(f"Especificidad: {especificidad:.2f}")
+print(" Mide la probabilidad de que el clasificador detecte un caso Negativo cuando en verdad lo es.\n")
+
+# 
 print(f"Precisión: {precision:.2f}")
+print(" Mide la probabilidad de que el clasificador detecte correctamente un caso positivo..\n")
+
+
 print(f"F1-score: {f1_score:.2f}")
+print("  Combina las medidas de precision y recall para devolver una medida de calidad m ́as general del modelo.\n")
+
 print(f"Tasa de verdaderos positivos (TPR): {recall:.2f}")
 print(f"Tasa de falsos positivos (FPR): {fpr:.2f}")
+print(hypothesis)
