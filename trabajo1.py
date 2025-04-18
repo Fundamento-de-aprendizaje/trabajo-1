@@ -1,8 +1,6 @@
 # @title
 # Se debe tener instalado las siguientes librerias 
-# pip install numpy
-# pip install pandas
-# pip install random
+# pip install numpy pandas scikit-learn matplotlib
 
 import numpy as np
 import pandas as pd
@@ -160,3 +158,136 @@ print("  Combina las medidas de precision y recall para devolver una medida de c
 print(f"Tasa de verdaderos positivos (TPR): {recall:.2f}")
 print(f"Tasa de falsos positivos (FPR): {fpr:.2f}")
 print(hypothesis)
+
+###################################################
+print("PUNTO 3")
+print("PUNTO 3")
+# Paso 1: Filtrar personas entre 40 y 45 años
+personas_40_45 = datosPrestamos[(datosPrestamos['Edad'] >= 40) & (datosPrestamos['Edad'] <= 45)].copy()
+
+# Convertir todas las columnas a tipo string para convertirlo en categórico
+for col in personas_40_45.columns:
+    personas_40_45[col] = personas_40_45[col].astype(str)
+
+# Dividir aleatoriamente los datos en entrenamiento (80%) y prueba (20%)
+datos = personas_40_45.values.tolist()
+random.shuffle(datos)
+tamano_entrenamiento = int(len(datos) * 0.8)
+entrenamiento = datos[:tamano_entrenamiento]
+prueba = datos[tamano_entrenamiento:]
+
+# Paso 2: Implementar Naive Bayes manualmente
+def entrenar_naive_bayes(datos_entrenamiento):
+    conteo_clases = {}
+    conteo_atributos = {}
+
+    for fila in datos_entrenamiento:
+        clase = fila[-1]
+        if clase not in conteo_clases:
+            conteo_clases[clase] = 0   #inicializa cada uno de los conjuntos de atributos
+            conteo_atributos[clase] = [{} for _ in range(len(fila) - 1)]
+        conteo_clases[clase] += 1
+
+        for i, atributo in enumerate(fila[:-1]):
+            if atributo not in conteo_atributos[clase][i]:
+                conteo_atributos[clase][i][atributo] = 0
+            conteo_atributos[clase][i][atributo] += 1
+    print(conteo_clases, conteo_atributos)
+    return conteo_clases, conteo_atributos
+   
+def predecir_naive_bayes(fila, conteo_clases, conteo_atributos, total_datos):
+    probabilidades = {}
+    for clase in conteo_clases:
+        probabilidad_clase = conteo_clases[clase] / total_datos
+        probabilidad_atributos = probabilidad_clase
+
+        for i, atributo in enumerate(fila[:-1]):
+            if atributo in conteo_atributos[clase][i]:
+                probabilidad_atributos *= conteo_atributos[clase][i][atributo] / conteo_clases[clase]
+            else:
+                probabilidad_atributos *= 0.0001  # Suavizado para evitar probabilidad 0
+
+        probabilidades[clase] = probabilidad_atributos
+
+    return max(probabilidades, key=probabilidades.get), probabilidades
+
+# Entrenar el modelo
+conteo_clases, conteo_atributos = entrenar_naive_bayes(entrenamiento)
+
+# Paso 3: Evaluar el modelo en el conjunto de prueba
+TP = FP = TN = FN = 0
+y_true = []
+y_scores = []
+
+for fila in prueba:
+    prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(entrenamiento))
+    verdadero_estado = fila[-1]
+    y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
+    y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)
+
+    if prediccion == "OTORGADO":
+        if verdadero_estado == "OTORGADO":
+            TP += 1
+        else:
+            FP += 1
+    else:
+        if verdadero_estado == "RECHAZADO":
+            TN += 1
+        else:
+            FN += 1
+
+# Paso 4: Calcular métricas
+accuracy = (TP + TN) / (TP + FP + TN + FN)
+precision = TP / (TP + FP) if TP + FP > 0 else 0
+recall = TP / (TP + FN) if TP + FN > 0 else 0
+f1_score = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
+
+# Mostrar resultados
+print("\n--- MATRIZ DE CONFUSIÓN 1 ---")
+print(f"TP (True Positive): {TP}")
+print(f"FN (False Negative): {FN}")
+print(f"FP (False Positive): {FP}")
+print(f"TN (True Negative): {TN}")
+print(" ", TP, "|", FN, "\n ", FP, "|", TN)
+
+print("\n--- MÉTRICAS ---")
+print(f"Accuracy: {accuracy:.2f}")
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+print(f"F1-score: {f1_score:.2f}")
+
+# Paso 5: Graficar la curva ROC
+def calcular_curva_roc(y_true, y_scores):
+    puntos = sorted(zip(y_scores, y_true), reverse=True)
+    tpr = []  # Tasa de verdaderos positivos
+    fpr = []  # Tasa de falsos positivos
+    TP = FP = 0
+    FN = sum(y_true)
+    TN = len(y_true) - FN
+
+    for score, label in puntos:
+        if label == 1:
+            TP += 1
+            FN -= 1
+        else:
+            FP += 1
+            TN -= 1
+        tpr.append(TP / (TP + FN) if TP + FN > 0 else 0)
+        fpr.append(FP / (FP + TN) if FP + TN > 0 else 0)
+
+    return fpr, tpr
+
+fpr, tpr = calcular_curva_roc(y_true, y_scores)
+
+# Graficar la curva ROC
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='Curva ROC')
+plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+plt.xlabel('Tasa de Falsos Positivos (FPR)')
+plt.ylabel('Tasa de Verdaderos Positivos (TPR)')
+plt.title('Curva ROC - Naive Bayes (40-45 años)')
+plt.legend(loc="lower right")
+plt.grid(True)
+plt.show()
