@@ -1,11 +1,12 @@
 # @title
+
 # Se debe tener instalado las siguientes librerias 
 # pip install numpy pandas scikit-learn matplotlib
 
 import numpy as np
 import pandas as pd
 import random
-from funciones import find_s, aplicarHipotesis, evaluar_hipotesis, metricas, separarDatosEnConjuntos
+from funciones import find_s, aplicarHipotesis, evaluar_hipotesis, metricas, separarDatosEnConjuntos, entrenar_naive_bayes, predecir_naive_bayes
 
 print("PUNTO 1")
 # leemos los datos del csv y le indicamos que columnas vamos a utilizar
@@ -25,9 +26,10 @@ hypothesis = find_s(entrenamiento)
 
 # Imprimimos los índicides del csv (Edad, sexo....)
 print("La hipótesis final es:")
-print(datosPrestamos.columns.to_list())
+#print(datosPrestamos.columns.to_list())
+print(datosPrestamos.columns.to_list()[:len(datosPrestamos.columns) -1])
 # Mostrar la hipótesis final
-print( "  ",hypothesis[0],"        ",hypothesis[1],"               ",hypothesis[2],"                ",hypothesis[3],"                ",hypothesis[4])
+print( "  ",hypothesis[0],"    ",hypothesis[1],"               ",hypothesis[2],"                ",hypothesis[3],"                     ",hypothesis[4])
 #print("La hipótesis final es:", hypothesis)
 
 # Estamos controlando la cantidad de personas total, 
@@ -67,41 +69,6 @@ for col in personas_40_45.columns:
 entrenamiento, prueba = separarDatosEnConjuntos(personas_40_45.values.tolist(),0.8)
 
 # Paso 2: Implementar Naive Bayes manualmente
-def entrenar_naive_bayes(datos_entrenamiento):
-    conteo_clases = {}
-    conteo_atributos = {}
-
-    for fila in datos_entrenamiento:
-        clase = fila[-1]
-        if clase not in conteo_clases:
-            conteo_clases[clase] = 0   #inicializa cada uno de los conjuntos de atributos
-            conteo_atributos[clase] = [{} for _ in range(len(fila) - 1)]
-        conteo_clases[clase] += 1
-
-        for i, atributo in enumerate(fila[:-1]):
-            if atributo not in conteo_atributos[clase][i]:
-                conteo_atributos[clase][i][atributo] = 0
-            conteo_atributos[clase][i][atributo] += 1
-    print("conteo_clases: ",conteo_clases, "\nconteo_atributos: ", conteo_atributos)
-    return conteo_clases, conteo_atributos
-   
-def predecir_naive_bayes(fila, conteo_clases, conteo_atributos, total_datos):
-    probabilidades = {}
-    for clase in conteo_clases:
-        probabilidad_clase = conteo_clases[clase] / total_datos
-        probabilidad_atributos = probabilidad_clase
-
-        for i, atributo in enumerate(fila[:-1]):
-            if atributo in conteo_atributos[clase][i]:
-                probabilidad_atributos *= conteo_atributos[clase][i][atributo] / conteo_clases[clase]
-               # print("\nif fila",conteo_atributos[clase][i],"valor ",conteo_atributos[clase][i][atributo])
-            else:
-                probabilidad_atributos *= 0.0001  # Suavizado para evitar probabilidad 0
-               # print("\nelse fila",conteo_atributos[clase][i])
-
-        probabilidades[clase] = probabilidad_atributos
-   
-    return max(probabilidades, key=probabilidades.get), probabilidades
 
 # Entrenar el modelo
 conteo_clases, conteo_atributos = entrenar_naive_bayes(entrenamiento)
@@ -121,17 +88,17 @@ for fila in prueba:
 
     if prediccion == "OTORGADO":
         if verdadero_estado == "OTORGADO":
-            TP += 1
+            TP += 1      #se etiquetó bien, la predicción fue correcta
         else:
-            FP += 1
+            FP += 1      #está etiquetado como "OTORGADO" pero en realidad es "RECHAZADO"
     else:
         if verdadero_estado == "RECHAZADO":
-            TN += 1
+            TN += 1      #se etiquetó bien, la predicción fue correcta ,está "RECHAZADO"
         else:
-            FN += 1
+            FN += 1      #está etiquetado como "RECHAZADO" pero en realidad es "OTORGADO"
 
 
-# USAMOS UNA FUNCION PARA EL PUNTO 2 y 3. Para la parte de metricuas.
+# USAMOS UNA FUNCION PARA EL PUNTO 2 y 3. Para la parte de metricas.
 
 metricas(TP,FP,TN,FN)
 
@@ -161,9 +128,12 @@ fpr, tpr = calcular_curva_roc(y_true, y_scores)
 # Graficar la curva ROC
 import matplotlib.pyplot as plt
 
-plt.figure(figsize=(8, 6))
-plt.plot(fpr, tpr, color='darkorange', lw=2, label='Curva ROC')
-plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+fig=plt.figure(figsize=(10, 8))
+fig.patch.set_facecolor('#e6f2ff')
+ax = plt.gca()  # obtiene el eje actual
+ax.set_facecolor('black')  # o cualquier color: 'white', '#f0f0f0', 'black', etc.
+plt.plot(fpr, tpr, color='#FF0B55', lw=2, label='Curva ROC')
+plt.plot([0, 1], [0, 1], color='olive', linestyle='--')
 plt.xlabel('Tasa de Falsos Positivos (FPR)')
 plt.ylabel('Tasa de Verdaderos Positivos (TPR)')
 plt.title('Curva ROC - Naive Bayes (40-45 años)')
@@ -171,3 +141,5 @@ plt.legend(loc="lower right")
 plt.grid(True)
 plt.show()
 
+# 'blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'white',
+# 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'navy', 'teal'
