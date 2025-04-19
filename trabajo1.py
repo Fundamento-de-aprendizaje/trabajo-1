@@ -116,47 +116,92 @@ def evaluar_hipotesis(hypothesis, datos_prueba):
 # Obtener los valores
 TP, FP, TN, FN = evaluar_hipotesis(hypothesis, prueba)
 
-# Mostrar la matriz de confusión
-print("\n--- MATRIZ DE CONFUSIÓN ---")
-print(f"TP (TRUE POSITIVE): {TP}")
-print(f"FP (FALSE POSITIVE): {FP}")
-print(f"TN (TRUE NEGATIVE): {TN}")
-print(f"FN (FALSE NEGATIVE): {FN}")
-print(" ",TP,  "|", FN , "\n ",FP ,"|" ,TN )
 
-# Cálculos de métricas
-total = TP + FP + TN + FN
-accuracy = (TP + TN) / total
-recall = TP / (TP + FN) if TP + FN > 0 else 0
-especificidad = TN / (TN + FP) if TN + FP > 0 else 0
-precision = TP / (TP + FP) if TP + FP > 0 else 0
-f1_score = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
-fpr = FP / (FP + TN) if FP + TN > 0 else 0
+## FUNCIONES PARA AMBOS EJERCICIOS 
+def metricas (TP,FP,TN,FN):
+    print("\nMATRIZ DE CONFUSION")
+    print(f"TP (TRUE POSITIVE): {TP}")
+    print(f"FP (FALSE POSITIVE): {FP}")
+    print(f"TN (TRUE NEGATIVE): {TN}")
+    print(f"FN (FALSE NEGATIVE): {FN}")
+    print(" ",TP,  "|", FN , "\n ",FP ,"|" ,TN )
 
-# Mostrar métricas
-print("\n--- MÉTRICAS ---")
+    # Cálculos de métricas
+    total = TP + FP + TN + FN
+    accuracy = (TP + TN) / total
+    recall = TP / (TP + FN) if TP + FN > 0 else 0
+    especificidad = TN / (TN + FP) if TN + FP > 0 else 0
+    precision = TP / (TP + FP) if TP + FP > 0 else 0
+    f1_score = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
+    fpr = FP / (FP + TN) if FP + TN > 0 else 0
+
+    # Mostrar métricas
+    print("\n--- MÉTRICAS ---")
+    
+    print(f"Accuracy(proporción correctamente clasificadas): {accuracy:.2f}")
+    print("Es la proporci ́on de instancias que han sido correctamente clasificadas.\n")
+
+
+    print(f"Recall (Sensibilidad): {recall:.2f}")
+    print("Mide la probabilidad de que el clasificador detecte un caso Positivo cuando en verdad lo es.\n")
+
+
+    print(f"Especificidad: {especificidad:.2f}")
+    print(" Mide la probabilidad de que el clasificador detecte un caso Negativo cuando en verdad lo es.\n")
+
+
+    print(f"Precisión: {precision:.2f}")
+    print(" Mide la probabilidad de que el clasificador detecte correctamente un caso positivo..\n")
+
+
+    print(f"F1-score: {f1_score:.2f}")
+    print("  Combina las medidas de precision y recall para devolver una medida de calidad m ́as general del modelo.\n")
+
+    print(f"Tasa de verdaderos positivos (TPR): {recall:.2f}")
+    print(f"Tasa de falsos positivos (FPR): {fpr:.2f}")
+
+# # Mostrar la matriz de confusión
+# print("\n--- MATRIZ DE CONFUSIÓN ---")
+# print(f"TP (TRUE POSITIVE): {TP}")
+# print(f"FP (FALSE POSITIVE): {FP}")
+# print(f"TN (TRUE NEGATIVE): {TN}")
+# print(f"FN (FALSE NEGATIVE): {FN}")
+# print(" ",TP,  "|", FN , "\n ",FP ,"|" ,TN )
+
+# # Cálculos de métricas
+# total = TP + FP + TN + FN
+# accuracy = (TP + TN) / total
+# recall = TP / (TP + FN) if TP + FN > 0 else 0
+# especificidad = TN / (TN + FP) if TN + FP > 0 else 0
+# precision = TP / (TP + FP) if TP + FP > 0 else 0
+# f1_score = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
+# fpr = FP / (FP + TN) if FP + TN > 0 else 0
+
+# # Mostrar métricas
+# print("\n--- MÉTRICAS ---")
  
-print(f"Accuracy(proporción correctamente clasificadas): {accuracy:.2f}")
-print("Es la proporci ́on de instancias que han sido correctamente clasificadas.\n")
+# print(f"Accuracy(proporción correctamente clasificadas): {accuracy:.2f}")
+# print("Es la proporci ́on de instancias que han sido correctamente clasificadas.\n")
 
 
-print(f"Recall (Sensibilidad): {recall:.2f}")
-print("Mide la probabilidad de que el clasificador detecte un caso Positivo cuando en verdad lo es.\n")
+# print(f"Recall (Sensibilidad): {recall:.2f}")
+# print("Mide la probabilidad de que el clasificador detecte un caso Positivo cuando en verdad lo es.\n")
 
 
-print(f"Especificidad: {especificidad:.2f}")
-print(" Mide la probabilidad de que el clasificador detecte un caso Negativo cuando en verdad lo es.\n")
+# print(f"Especificidad: {especificidad:.2f}")
+# print(" Mide la probabilidad de que el clasificador detecte un caso Negativo cuando en verdad lo es.\n")
 
-# 
-print(f"Precisión: {precision:.2f}")
-print(" Mide la probabilidad de que el clasificador detecte correctamente un caso positivo..\n")
+# # 
+# print(f"Precisión: {precision:.2f}")
+# print(" Mide la probabilidad de que el clasificador detecte correctamente un caso positivo..\n")
 
 
-print(f"F1-score: {f1_score:.2f}")
-print("  Combina las medidas de precision y recall para devolver una medida de calidad m ́as general del modelo.\n")
+# print(f"F1-score: {f1_score:.2f}")
+# print("  Combina las medidas de precision y recall para devolver una medida de calidad m ́as general del modelo.\n")
 
-print(f"Tasa de verdaderos positivos (TPR): {recall:.2f}")
-print(f"Tasa de falsos positivos (FPR): {fpr:.2f}")
+# print(f"Tasa de verdaderos positivos (TPR): {recall:.2f}")
+# print(f"Tasa de falsos positivos (FPR): {fpr:.2f}")
+metricas(TP,FP,TN,FN)
 print(hypothesis)
 
 ###################################################
@@ -192,7 +237,7 @@ def entrenar_naive_bayes(datos_entrenamiento):
             if atributo not in conteo_atributos[clase][i]:
                 conteo_atributos[clase][i][atributo] = 0
             conteo_atributos[clase][i][atributo] += 1
-    print(conteo_clases, conteo_atributos)
+    print("conteo_clases: ",conteo_clases, "\nconteo_atributos: ", conteo_atributos)
     return conteo_clases, conteo_atributos
    
 def predecir_naive_bayes(fila, conteo_clases, conteo_atributos, total_datos):
@@ -204,11 +249,13 @@ def predecir_naive_bayes(fila, conteo_clases, conteo_atributos, total_datos):
         for i, atributo in enumerate(fila[:-1]):
             if atributo in conteo_atributos[clase][i]:
                 probabilidad_atributos *= conteo_atributos[clase][i][atributo] / conteo_clases[clase]
+               # print("\nif fila",conteo_atributos[clase][i],"valor ",conteo_atributos[clase][i][atributo])
             else:
                 probabilidad_atributos *= 0.0001  # Suavizado para evitar probabilidad 0
+               # print("\nelse fila",conteo_atributos[clase][i])
 
         probabilidades[clase] = probabilidad_atributos
-
+   
     return max(probabilidades, key=probabilidades.get), probabilidades
 
 # Entrenar el modelo
@@ -218,6 +265,8 @@ conteo_clases, conteo_atributos = entrenar_naive_bayes(entrenamiento)
 TP = FP = TN = FN = 0
 y_true = []
 y_scores = []
+
+
 
 for fila in prueba:
     prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(entrenamiento))
@@ -236,25 +285,30 @@ for fila in prueba:
         else:
             FN += 1
 
-# Paso 4: Calcular métricas
-accuracy = (TP + TN) / (TP + FP + TN + FN)
-precision = TP / (TP + FP) if TP + FP > 0 else 0
-recall = TP / (TP + FN) if TP + FN > 0 else 0
-f1_score = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
 
-# Mostrar resultados
-print("\n--- MATRIZ DE CONFUSIÓN 1 ---")
-print(f"TP (True Positive): {TP}")
-print(f"FN (False Negative): {FN}")
-print(f"FP (False Positive): {FP}")
-print(f"TN (True Negative): {TN}")
-print(" ", TP, "|", FN, "\n ", FP, "|", TN)
+# USAMOS UNA FUNCION PARA EL PUNTO 2 y 3. Para la parte de metricuas.
 
-print("\n--- MÉTRICAS ---")
-print(f"Accuracy: {accuracy:.2f}")
-print(f"Precision: {precision:.2f}")
-print(f"Recall: {recall:.2f}")
-print(f"F1-score: {f1_score:.2f}")
+metricas(TP,FP,TN,FN)
+
+# # Paso 4: Calcular métricas
+# accuracy = (TP + TN) / (TP + FP + TN + FN)
+# precision = TP / (TP + FP) if TP + FP > 0 else 0
+# recall = TP / (TP + FN) if TP + FN > 0 else 0
+# f1_score = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
+
+# # Mostrar resultados
+# print("\n--- MATRIZ DE CONFUSIÓN 1 ---")
+# print(f"TP (True Positive): {TP}")
+# print(f"FN (False Negative): {FN}")
+# print(f"FP (False Positive): {FP}")
+# print(f"TN (True Negative): {TN}")
+# print(" ", TP, "|", FN, "\n ", FP, "|", TN)
+
+# print("\n--- MÉTRICAS ---")
+# print(f"Accuracy: {accuracy:.2f}")
+# print(f"Precision: {precision:.2f}")
+# print(f"Recall: {recall:.2f}")
+# print(f"F1-score: {f1_score:.2f}")
 
 # Paso 5: Graficar la curva ROC
 def calcular_curva_roc(y_true, y_scores):
@@ -291,3 +345,4 @@ plt.title('Curva ROC - Naive Bayes (40-45 años)')
 plt.legend(loc="lower right")
 plt.grid(True)
 plt.show()
+
