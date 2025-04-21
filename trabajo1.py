@@ -78,14 +78,8 @@ TP = FP = TN = FN = 0
 y_true = []
 y_scores = []
 
-
-
-for fila in prueba:
-    prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(entrenamiento))
-    verdadero_estado = fila[-1]
-    y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
-    y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)
-
+def construirMatrizDeConfusion(prediccion):
+    global TP, FP, TN, FN
     if prediccion == "OTORGADO":
         if verdadero_estado == "OTORGADO":
             TP += 1      #se etiquetó bien, la predicción fue correcta
@@ -95,8 +89,15 @@ for fila in prueba:
         if verdadero_estado == "RECHAZADO":
             TN += 1      #se etiquetó bien, la predicción fue correcta ,está "RECHAZADO"
         else:
-            FN += 1      #está etiquetado como "RECHAZADO" pero en realidad es "OTORGADO"
+            FN += 1
 
+for fila in prueba:
+    prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(entrenamiento))
+    verdadero_estado = fila[-1]
+    y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
+    y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)
+
+    construirMatrizDeConfusion(prediccion)
 
 # USAMOS UNA FUNCION PARA EL PUNTO 2 y 3. Para la parte de metricas.
 
