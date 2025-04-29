@@ -60,7 +60,6 @@ metricas(TP,FP,TN,FN)
 print("\nPUNTO 3")
 # Paso 1: Filtrar personas entre 40 y 45 años
 personas_40_45 = datosPrestamos[(datosPrestamos['Edad'] >= 40) & (datosPrestamos['Edad'] <= 45)].copy()
-
 # Convertir todas las columnas a tipo string para convertirlo en categórico
 for col in personas_40_45.columns:
     personas_40_45[col] = personas_40_45[col].astype(str)
@@ -78,6 +77,16 @@ TP = FP = TN = FN = 0
 y_true = []
 y_scores = []
 
+valores_posibles = {}
+
+# Recorremos cada columna (sin contar la última que es la clase)
+for i in range(len(entrenamiento[0]) - 1):
+    valores_set = set()
+    for fila in entrenamiento:
+        valores_set.add(fila[i])
+    valores_posibles[i] = list(valores_set)
+
+
 def construirMatrizDeConfusion(prediccion):
     global TP, FP, TN, FN
     if prediccion == "OTORGADO":
@@ -92,7 +101,7 @@ def construirMatrizDeConfusion(prediccion):
             FN += 1
 
 for fila in prueba:
-    prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(prueba))
+    prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(prueba),valores_posibles)
     verdadero_estado = fila[-1]
     y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
     y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)
