@@ -18,7 +18,7 @@ datosPrestamos = pd.read_csv(url, usecols=[0, 1, 2, 5,12,13], encoding='latin1')
 # Estamos haciendo una copia exacta de la lista de personas. Esta generando una nueva referencia.
 personasDe50Anios = datosPrestamos[datosPrestamos['Edad'] == 50].values.tolist().copy() 
 
-entrenamiento, prueba = separarDatosEnConjuntos(personasDe50Anios,0.75)
+entrenamiento, prueba = separarDatosEnConjuntos(personasDe50Anios,0.75,False)
 ########################
 
 # Llamar a la funcion Find-S
@@ -66,7 +66,7 @@ for col in personas_40_45.columns:
     personas_40_45[col] = personas_40_45[col].astype(str)
 
 # Dividir aleatoriamente los datos en entrenamiento (80%) y prueba (20%)
-entrenamiento, prueba = separarDatosEnConjuntos(personas_40_45.values.tolist(),0.8)
+entrenamiento, prueba = separarDatosEnConjuntos(personas_40_45.values.tolist(),0.8,True)
 
 # Paso 2: Implementar Naive Bayes manualmente
 
@@ -92,7 +92,7 @@ def construirMatrizDeConfusion(prediccion):
             FN += 1
 
 for fila in prueba:
-    prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(entrenamiento))
+    prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(prueba))
     verdadero_estado = fila[-1]
     y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
     y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)

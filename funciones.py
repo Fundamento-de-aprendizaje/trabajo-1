@@ -25,7 +25,7 @@ def aplicarHipotesis(examples, hypothesis):
                 break
         if cumple:
             contador += 1
-            #print(example)
+            print("[",example[0],"|",example[1],"|",example[2],"|",example[3],"|",example[4],"|",example[5],"|","OTORGADO ]" )
       # else: 
             #print("NO CUMPLE", example)
     return contador
@@ -93,8 +93,9 @@ def metricas (TP,FP,TN,FN):
     print(f"Tasa de verdaderos positivos (TPR): {recall:.2f}")
     print(f"Tasa de falsos positivos (FPR): {fpr:.2f}")
 
-def separarDatosEnConjuntos(datos,porcentaje):
-    random.shuffle(datos)
+def separarDatosEnConjuntos(datos,porcentaje,mezclar):
+    if(mezclar):
+        random.shuffle(datos)
     # Calcula el índice de división ("porcentaje" de los datos)
     tamano_entrenamiento = int(len(datos) * porcentaje)
 
