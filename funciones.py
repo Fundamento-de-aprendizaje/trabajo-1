@@ -25,7 +25,7 @@ def aplicarHipotesis(examples, hypothesis):
                 break
         if cumple:
             contador += 1
-            #print(example)
+            print("[",example[0],"|",example[1],"|",example[2],"|",example[3],"|",example[4],"|",example[5],"|","OTORGADO ]" )
       # else: 
             #print("NO CUMPLE", example)
     return contador
@@ -93,8 +93,9 @@ def metricas (TP,FP,TN,FN):
     print(f"Tasa de verdaderos positivos (TPR): {recall:.2f}")
     print(f"Tasa de falsos positivos (FPR): {fpr:.2f}")
 
-def separarDatosEnConjuntos(datos,porcentaje):
-    random.shuffle(datos)
+def separarDatosEnConjuntos(datos,porcentaje,mezclar):
+    if(mezclar):
+        random.shuffle(datos)
     # Calcula el índice de división ("porcentaje" de los datos)
     tamano_entrenamiento = int(len(datos) * porcentaje)
 
@@ -121,30 +122,60 @@ def entrenar_naive_bayes(datos_entrenamiento):
     #print("conteo_clases: ",conteo_clases, "\nconteo_atributos: ", conteo_atributos)
     return conteo_clases, conteo_atributos
 
-def predecir_naive_bayes(fila, conteo_clases, conteo_atributos, total_datos):
-    probabilidades = {}
-    #fila : una nueva observación sin la clase (ej: ['Edad', 'Sexo', '?'])
-    #conteo_clases  : dict con el total de ejemplos por clase
-    #conteo_atributos : dict con los conteos de atributos por clase
-    #total_datos : total de filas en el conjunto de entrenamiento
+# def predecir_naive_bayes(fila, conteo_clases, conteo_atributos, total_datos):
+#     probabilidades = {}
+#     #fila : una nueva observación sin la clase (ej: ['Edad', 'Sexo', '?'])
+#     #conteo_clases  : dict con el total de ejemplos por clase
+#     #conteo_atributos : dict con los conteos de atributos por clase
+#     #total_datos : total de filas en el conjunto de entrenamiento
 
-    #calcula la probabilidad de que la fila pertenezca a cada clase y devuelve 
-    # la clase más probable (y también todas las probabilidades si querés verlas).
+#     #calcula la probabilidad de que la fila pertenezca a cada clase y devuelve 
+#     # la clase más probable (y también todas las probabilidades si querés verlas).
+#     for clase in conteo_clases:
+#         probabilidad_clase = conteo_clases[clase] / total_datos
+#         probabilidad_atributos = probabilidad_clase
+
+#         for i, atributo in enumerate(fila[:-1]):
+#             if atributo in conteo_atributos[clase][i]:
+#                 probabilidad_atributos *= conteo_atributos[clase][i][atributo] / conteo_clases[clase]
+#                # print("\nif fila",conteo_atributos[clase][i],"valor ",conteo_atributos[clase][i][atributo])
+#             else:
+#                 probabilidad_atributos *= 0.0001  # Suavizado para evitar probabilidad 0
+#                # print("\nelse fila",conteo_atributos[clase][i])
+
+#         probabilidades[clase] = probabilidad_atributos
+   
+#     return max(probabilidades, key=probabilidades.get), probabilidades
+
+def predecir_naive_bayes(fila, conteo_clases, conteo_atributos, total_datos, valores_posibles):
+    probabilidades = {}
+
+    # fila : nueva observación (sin clase), ej: ['Adulto', 'M']
+    # conteo_clases : dict con total de ejemplos por clase, ej: {'Si': 5, 'No': 3}
+    # conteo_atributos : dict con conteos de atributos por clase, estructura:
+    #    {'Si': {0: {'Joven': 2, 'Adulto': 3}, 1: {'M': 1, 'F': 4}}, ...}
+    # total_datos : total de filas de entrenamiento
+    # valores_posibles : dict que indica cuántos valores posibles tiene cada atributo:
+    #    ej: {0: ['Joven', 'Adulto', 'Mayor'], 1: ['M', 'F']}
+
     for clase in conteo_clases:
+        # P(clase)
         probabilidad_clase = conteo_clases[clase] / total_datos
-        probabilidad_atributos = probabilidad_clase
+        probabilidad_total = probabilidad_clase
 
         for i, atributo in enumerate(fila[:-1]):
-            if atributo in conteo_atributos[clase][i]:
-                probabilidad_atributos *= conteo_atributos[clase][i][atributo] / conteo_clases[clase]
-               # print("\nif fila",conteo_atributos[clase][i],"valor ",conteo_atributos[clase][i][atributo])
-            else:
-                probabilidad_atributos *= 0.0001  # Suavizado para evitar probabilidad 0
-               # print("\nelse fila",conteo_atributos[clase][i])
+            posibles_valores = len(valores_posibles[i])  # k en el denominador
+            conteo_valor = conteo_atributos[clase][i].get(atributo, 0)
 
-        probabilidades[clase] = probabilidad_atributos
-   
+            # Aplicamos suavizado de Laplace:
+            probabilidad_atributo_dado_clase = (conteo_valor + 1) / (conteo_clases[clase] + posibles_valores)
+            probabilidad_total *= probabilidad_atributo_dado_clase
+
+        probabilidades[clase] = probabilidad_total
+
+    # Devolvemos la clase más probable y también todas las probabilidades
     return max(probabilidades, key=probabilidades.get), probabilidades
+
 
 def calcular_curva_roc(y_true, y_scores):
     puntos = sorted(zip(y_scores, y_true), reverse=True)
