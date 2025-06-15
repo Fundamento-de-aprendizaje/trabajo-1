@@ -29,10 +29,11 @@ def aplicarHipotesis(datosDePrueba, hypothesis):
       
     return prediccion
 
-def calcularMatrizDeConfusion(dataSet,hypothesis ):
+def calcularMatrizDeConfusion(dataSet,hypothesis=[] ):
     TP = FP = TN = FN = 0
 
     for persona in dataSet:
+        
         estadoPrestamo = persona[-1]  # Última columna es la etiqueta real
         prediccion = "OTORGADO"
         for i in range(len(hypothesis)):
@@ -50,12 +51,17 @@ def calcularMatrizDeConfusion(dataSet,hypothesis ):
                 TN += 1
             else:
                 FN += 1
-    print("\nMATRIZ DE CONFUSION")
-    print(f"TP (TRUE POSITIVE): {TP}")
+
+            FN += 1  
+            
+    print("\nMATRIZ DE CONFUSION PUNTO 2\n")
+    print(" ",TP,  "|", FN , "\n ",FP ,"|" ,TN )   
+    print(f"\nTP (TRUE POSITIVE): {TP}")
     print(f"FP (FALSE POSITIVE): {FP}")
     print(f"TN (TRUE NEGATIVE): {TN}")
-    print(f"FN (FALSE NEGATIVE): {FN}")
-    print(" ",TP,  "|", FN , "\n ",FP ,"|" ,TN ) 
+    print(f"FN (FALSE NEGATIVE): {FN}\n")            
+      
+    
 
     return TP, FP, TN, FN
 
@@ -74,20 +80,20 @@ def calcularMetricas (TP,FP,TN,FN):
     # Mostrar métricas
     print("\n--- MÉTRICAS ---")
     
-    print(f"Accuracy(proporción correctamente clasificadas): {accuracy:.2f}")
-    print("Es la proporción de instancias que han sido correctamente clasificadas.\n")
+    print(f"ACCURACY(proporción correctamente clasificadas): {accuracy:.2f}\n")
+    
 
-    print(f"Recall (Sensibilidad): {recall:.2f}")
-    print("Mide la probabilidad de que el clasificador detecte un caso Positivo cuando en verdad lo es.\n")
+    print(f"RECALL (Sensibilidad): {recall:.2f}")
+    print("Recall: mide la probabilidad de que el clasificador detecte un caso Positivo cuando en verdad lo es.\n")
 
-    print(f"Especificidad: {especificidad:.2f}")
-    print(" Mide la probabilidad de que el clasificador detecte un caso Negativo cuando en verdad lo es.\n")
+    print(f"ESPECIFICIDAD: {especificidad:.2f}")
+    print("Especificidad: Mide la probabilidad de que el clasificador detecte un caso Negativo cuando en verdad lo es.\n")
 
-    print(f"Precisión: {precision:.2f}")
-    print(" Mide la probabilidad de que el clasificador detecte correctamente un caso positivo..\n")
+    print(f"PRECISIÓN: {precision:.2f}")
+    print("Precisión: Mide la probabilidad de que el clasificador detecte correctamente un caso positivo..\n")
 
-    print(f"F1-score: {f1_score:.2f}")
-    print("  Combina las medidas de precision y recall para devolver una medida de calidad m ́as general del modelo.\n")
+    print(f"F1-SCORE: {f1_score:.2f}")
+    print("F1-score: Combina las medidas de precision y recall para devolver una medida de calidad m ́as general del modelo.\n")
 
     print(f"Tasa de verdaderos positivos (TPR): {recall:.2f}")
     print(f"Tasa de falsos positivos (FPR): {fpr:.2f}")
@@ -95,6 +101,7 @@ def calcularMetricas (TP,FP,TN,FN):
 def separarDatosEnConjuntos(datos,porcentaje,mezclar):
     if(mezclar):
         random.shuffle(datos)
+        
     # Calcula el índice de división ("porcentaje" de los datos)
     tamano_entrenamiento = int(len(datos) * porcentaje)
 
@@ -125,19 +132,20 @@ def entrenar_naive_bayes(datos_entrenamiento):
 
 def predecir_naive_bayes(persona, conteo_clases, conteo_atributos, total_datos, valores_posibles):
     probabilidades = {}
-
+    variable_suavizado=1
+    k= len(conteo_clases)
    
     for clase in conteo_clases:
-        # P(clase)
-        probabilidad_clase = conteo_clases[clase] / total_datos
+        # La probabilidad a priori de la clase no tiene suavizado. Si querés que tu implementación 
+        # respete completamente la fórmula con Laplace, deberías sumar 1 al numerador y sumar K al denominador.
+        probabilidad_clase = (conteo_clases[clase] + variable_suavizado) / (total_datos + k)
         probabilidad_total = probabilidad_clase
-
+        
         for i, atributo in enumerate(persona[:-1]):
             posibles_valores = len(valores_posibles[i])  # k en el denominador
             conteo_valor = conteo_atributos[clase][i].get(atributo, 0)
-
-            # Aplicamos suavizado de Laplace:
-            probabilidad_atributo_dado_clase = (conteo_valor + 1) / (conteo_clases[clase] + posibles_valores)
+            #Las probabilidades condicionales (atributo dado clase) están bien con suavizado.
+            probabilidad_atributo_dado_clase = (conteo_valor + variable_suavizado) / (conteo_clases[clase] + posibles_valores)
             probabilidad_total *= probabilidad_atributo_dado_clase
 
         probabilidades[clase] = probabilidad_total

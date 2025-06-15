@@ -32,3 +32,22 @@
     # total_datos : total de filas de entrenamiento
     # valores_posibles : dict que indica cuántos valores posibles tiene cada atributo:
     #    ej: {0: ['Joven', 'Adulto', 'Mayor'], 1: ['M', 'F']}
+def calcular_curva_roc(y_true, y_scores):
+    puntos = sorted(zip(y_scores, y_true), reverse=True)
+    tpr = []  # Tasa de verdaderos positivos
+    fpr = []  # Tasa de falsos positivos
+    TP = FP = 0
+    FN = sum(y_true)
+    TN = len(y_true) - FN
+
+    for score, label in puntos:
+        if label == 1:
+            TP += 1
+            FN -= 1
+        else:
+            FP += 1
+            TN -= 1
+        tpr.append(TP / (TP + FN) if TP + FN > 0 else 0)
+        fpr.append(FP / (FP + TN) if FP + TN > 0 else 0)
+
+    return fpr, tpr

@@ -3,8 +3,9 @@
 
 import numpy as snp
 import pandas as pd
-import random
-from funciones import calcularMetricas, find_s, aplicarHipotesis, calcularMatrizDeConfusion, separarDatosEnConjuntos, entrenar_naive_bayes, predecir_naive_bayes
+from funciones import calcularMetricas, find_s, aplicarHipotesis, calcularMatrizDeConfusion, separarDatosEnConjuntos, entrenar_naive_bayes, predecir_naive_bayes,calcular_curva_roc
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_curve, auc
 
 print("PUNTO 1")
 # leemos los datos del csv y le indicamos que columnas vamos a utilizar
@@ -86,8 +87,12 @@ for i in range(len(entrenamiento[0]) - 1):
     valores_posibles[i] = list(valores_set)
 #ACA QUEDAMOS///
 
-def construirMatrizDeConfusion(prediccion):
-    global TP, FP, TN, FN
+
+for persona in prueba:
+    prediccion, probabilidades = predecir_naive_bayes(persona, conteo_clases, conteo_atributos, len(prueba),valores_posibles)
+    verdadero_estado = persona[-1]
+    y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
+    y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)
     if prediccion == "OTORGADO":
         if verdadero_estado == "OTORGADO":
             TP += 1      #se etiquetó bien, la predicción fue correcta
@@ -98,60 +103,41 @@ def construirMatrizDeConfusion(prediccion):
             TN += 1      #se etiquetó bien, la predicción fue correcta ,está "RECHAZADO"
         else:
             FN += 1
+# MATRIZ DE CONFUSÍON PUNTO 3"            
+print("\nMATRIZ DE CONFUSION PUNTO 3\n")
+print(" ",TP,  "|", FN , "\n ",FP ,"|" ,TN )   
+print(f"\nTP (TRUE POSITIVE): {TP}")
+print(f"FP (FALSE POSITIVE): {FP}")
+print(f"TN (TRUE NEGATIVE): {TN}")
+print(f"FN (FALSE NEGATIVE): {FN}\n")
 
-for fila in prueba:
-    prediccion, probabilidades = predecir_naive_bayes(fila, conteo_clases, conteo_atributos, len(prueba),valores_posibles)
-    verdadero_estado = fila[-1]
-    y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
-    y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)
-
-    construirMatrizDeConfusion(prediccion)
 
 # USAMOS UNA FUNCION PARA EL PUNTO 2 y 3. Para la parte de metricas.
 
 calcularMetricas(TP,FP,TN,FN)
 
 # Paso 5: Graficar la curva ROC
-def calcular_curva_roc(y_true, y_scores):
-    puntos = sorted(zip(y_scores, y_true), reverse=True)
-    tpr = []  # Tasa de verdaderos positivos
-    fpr = []  # Tasa de falsos positivos
-    TP = FP = 0
-    FN = sum(y_true)
-    TN = len(y_true) - FN
 
-    for score, label in puntos:
-        if label == 1:
-            TP += 1
-            FN -= 1
-        else:
-            FP += 1
-            TN -= 1
-        tpr.append(TP / (TP + FN) if TP + FN > 0 else 0)
-        fpr.append(FP / (FP + TN) if FP + TN > 0 else 0)
-
-    return fpr, tpr
 
 fpr, tpr = calcular_curva_roc(y_true, y_scores)
 
 # Graficar la curva ROC
-import matplotlib.pyplot as plt
+
+roc_auc = auc(fpr, tpr)
 
 fig=plt.figure(figsize=(10, 8))
 fig.patch.set_facecolor('#e6f2ff')
 ax = plt.gca()  # obtiene el eje actual
 ax.set_facecolor('black')  # o cualquier color: 'white', '#f0f0f0', 'black', etc.
-plt.plot(fpr, tpr, color='#FF0B55', lw=2, label='Curva ROC')
+plt.plot(fpr, tpr, color='#FF0B55', lw=2, label=f'Curva ROC (AUC = {roc_auc:.2f})')
 plt.plot([0, 1], [0, 1], color='olive', linestyle='--')
 plt.xlabel('Tasa de Falsos Positivos (FPR)')
 plt.ylabel('Tasa de Verdaderos Positivos (TPR)')
 plt.title('Curva ROC - Naive Bayes (40-45 años)')
 plt.legend(loc="lower right")
-plt.grid(True)
+plt.grid(True, color='gray', linestyle='--', linewidth=0.5)
 plt.show()
 
-# 'blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'white',
-# 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'navy', 'teal'
 
 
 
