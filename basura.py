@@ -51,3 +51,18 @@ def calcular_curva_roc(y_true, y_scores):
         fpr.append(FP / (FP + TN) if FP + TN > 0 else 0)
 
     return fpr, tpr
+
+#********************
+y_trues = []
+y_prob = []
+
+for persona in prueba:
+    clase_predicha, probabilidades = predecir_naive_bayes(persona, conteo_clases, conteo_atributos, len(prueba), valores_posibles)
+    y_trues.append(persona[-1])  # Valor real (la clase verdadera)
+    y_prob.append(probabilidades["OTORGADO"])  # Probabilidad de la clase positiva
+
+fpr2, tpr2, umbrales = roc_curve(y_trues,y_prob, pos_label="OTORGADO")
+roc_auc2 = auc(fpr2, tpr2)
+
+#plt.plot(fpr2, tpr2, color='#FF0B55', lw=2, label=f'Curva ROC (AUC = {roc_auc2:.2f})')
+#****************************************

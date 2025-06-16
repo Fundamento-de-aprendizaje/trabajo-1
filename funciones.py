@@ -17,16 +17,24 @@ def find_s(examples):
 
 def aplicarHipotesis(datosDePrueba, hypothesis):
     prediccion = 0
+
+    formato = "[ {:<5} | {:<10} | {:<15} | {:<10} | {:<10} | {:<10} | {:<10} ]"
+    print(formato.format("Edad", "Sexo", "Educación", "Vivienda", "Préstamos", "Real", "Predicción"))
+
     for dato in datosDePrueba:
         cumple = True
         for i in range(len(hypothesis)):
             if hypothesis[i] != '?' and hypothesis[i] != dato[i]:
                 cumple = False
                 break
+
+        pred = "RECHAZADO"
         if cumple:
             prediccion += 1
-            print("[",dato[0],"|",dato[1],"|",dato[2],"|",dato[3],"|",dato[4],"|",dato[5],"|","OTORGADO ]" )
-      
+            pred = "OTORGADO"
+
+        print(formato.format(dato[0], dato[1], dato[2], dato[3], dato[4], dato[5], pred))
+
     return prediccion
 
 def calcularMatrizDeConfusion(dataSet,hypothesis=[] ):
@@ -130,22 +138,22 @@ def entrenar_naive_bayes(datos_entrenamiento):
 
 
 
-def predecir_naive_bayes(persona, conteo_clases, conteo_atributos, total_datos, valores_posibles):
+def predecir_naive_bayes(persona, conteo_clases, conteo_atributos, datos_de_prueba, valores_posibles):
     probabilidades = {}
-    variable_suavizado=1
-    k= len(conteo_clases)
+    suavizado=1   
+    k= len(conteo_clases)  
    
     for clase in conteo_clases:
-        # La probabilidad a priori de la clase no tiene suavizado. Si querés que tu implementación 
-        # respete completamente la fórmula con Laplace, deberías sumar 1 al numerador y sumar K al denominador.
-        probabilidad_clase = (conteo_clases[clase] + variable_suavizado) / (total_datos + k)
-        probabilidad_total = probabilidad_clase
+       
+        # respeta completamente la fórmula con Laplace,suma 1 al numerador y suma K al denominador.
+        probabilidad_clase = (conteo_clases[clase] + suavizado) / (datos_de_prueba + k)# La probabilidad a priori de la clase  tiene suavizado.
+        probabilidad_total = probabilidad_clase                  # k en el denominador
         
         for i, atributo in enumerate(persona[:-1]):
-            posibles_valores = len(valores_posibles[i])  # k en el denominador
+            posibles_valores = len(valores_posibles[i]) 
             conteo_valor = conteo_atributos[clase][i].get(atributo, 0)
             #Las probabilidades condicionales (atributo dado clase) están bien con suavizado.
-            probabilidad_atributo_dado_clase = (conteo_valor + variable_suavizado) / (conteo_clases[clase] + posibles_valores)
+            probabilidad_atributo_dado_clase = (conteo_valor + suavizado) / (conteo_clases[clase] + suavizado*posibles_valores)
             probabilidad_total *= probabilidad_atributo_dado_clase
 
         probabilidades[clase] = probabilidad_total
@@ -153,14 +161,16 @@ def predecir_naive_bayes(persona, conteo_clases, conteo_atributos, total_datos, 
     # Devolvemos la clase más probable y también todas las probabilidades
     return max(probabilidades, key=probabilidades.get), probabilidades
 
-
 def calcular_curva_roc(y_true, y_scores):
     puntos = sorted(zip(y_scores, y_true), reverse=True)
     tpr = []  # Tasa de verdaderos positivos
     fpr = []  # Tasa de falsos positivos
+    umbrales = []
     TP = FP = 0
     FN = sum(y_true)
     TN = len(y_true) - FN
+
+    # print("Puntosssss", puntos)
 
     for score, label in puntos:
         if label == 1:
@@ -171,7 +181,11 @@ def calcular_curva_roc(y_true, y_scores):
             TN -= 1
         tpr.append(TP / (TP + FN) if TP + FN > 0 else 0)
         fpr.append(FP / (FP + TN) if FP + TN > 0 else 0)
+        umbrales.append(score)
+        print(score)
 
-    return fpr, tpr
+
+    return fpr, tpr,umbrales
+
 
     
