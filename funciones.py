@@ -15,7 +15,7 @@ def find_s(examples):
 
     return hypothesis
 
-def aplicarHipotesis(datosDePrueba, hypothesis):
+def evaluar_hipotesis(datosDePrueba, hypothesis):
     prediccion = 0
     for dato in datosDePrueba:
         cumple = True

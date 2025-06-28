@@ -3,7 +3,7 @@
 
 import numpy as snp
 import pandas as pd
-from funciones import calcularMetricas, find_s, aplicarHipotesis, calcularMatrizDeConfusion, separarDatosEnConjuntos, entrenar_naive_bayes, predecir_naive_bayes,calcular_curva_roc
+from funciones import calcularMetricas, find_s, evaluar_hipotesis, calcularMatrizDeConfusion, separarDatosEnConjuntos, entrenar_naive_bayes, predecir_naive_bayes,calcular_curva_roc
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 
@@ -37,8 +37,8 @@ print( "  ",hypothesis[0],"    ",hypothesis[1],"               ",
 print("\nCantidades obtenidas luego de filtrar a las personas de 50")
 print( {"Total de personas con 50 años:": len(personasDe50Anios), "Entrenamiento": len(entrenamiento),"Prueba":len(prueba)})
 
-# Llamar a la funcion aplicarHipotesis
-prediccion= aplicarHipotesis(prueba,hypothesis)
+# Llamar a la funcion evaluar_hipotesis
+prediccion= evaluar_hipotesis(prueba,hypothesis)
 print("\nAplicamos la Hipótesis al grupo de prueba y obtuvimos estos resultados")
 
 print({
@@ -89,8 +89,7 @@ for i in range(len(entrenamiento[0]) - 1):
 
 
 for persona in prueba:
-    total_datos = len(entrenamiento)
-    prediccion, probabilidades = predecir_naive_bayes(persona, conteo_clases, conteo_atributos, total_datos, valores_posibles)
+    prediccion, probabilidades = predecir_naive_bayes(persona, conteo_clases, conteo_atributos, len(entrenamiento),valores_posibles)
     verdadero_estado = persona[-1]
     y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
     y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)
