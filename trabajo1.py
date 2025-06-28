@@ -89,7 +89,8 @@ for i in range(len(entrenamiento[0]) - 1):
 
 
 for persona in prueba:
-    prediccion, probabilidades = predecir_naive_bayes(persona, conteo_clases, conteo_atributos, len(prueba),valores_posibles)
+    total_datos = len(entrenamiento)
+    prediccion, probabilidades = predecir_naive_bayes(persona, conteo_clases, conteo_atributos, total_datos, valores_posibles)
     verdadero_estado = persona[-1]
     y_true.append(1 if verdadero_estado == "OTORGADO" else 0)
     y_scores.append(probabilidades["OTORGADO"] if "OTORGADO" in probabilidades else 0)
